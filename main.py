@@ -38,14 +38,14 @@ class Album:
         return {
             "rank": self.rank,
             "title": self.title,
-            "artists": ";".join(self.artists),
+            "artists": self.artists,
             "average_score": self.average_score,
             "num_ratings": self.num_ratings,
             "num_reviews": self.num_reviews,
             "release_date": self.release_date,
-            "primary_genres": ";".join(self.primary_genres),
-            "secondary_genres": ";".join(self.secondary_genres),
-            "descriptors": ";".join(self.descriptors),
+            "primary_genres": self.primary_genres,
+            "secondary_genres": self.secondary_genres,
+            "descriptors": self.descriptors,
             "rym_href": self.rym_href,
         }
 
@@ -54,14 +54,14 @@ class Album:
         return Album(
             rank=data["rank"],
             title=data["title"],
-            artists=data["artists"].split(";"),
+            artists=data["artists"],
             average_score=data["average_score"],
             num_ratings=data["num_ratings"],
             num_reviews=data["num_reviews"],
             release_date=data["release_date"],
-            primary_genres=data["primary_genres"].split(";"),
-            secondary_genres=data["secondary_genres"].split(";"),
-            descriptors=data["descriptors"].split(";"),
+            primary_genres=data["primary_genres"],
+            secondary_genres=data["secondary_genres"],
+            descriptors=data["descriptors"],
             rym_href=data["rym_href"],
         )
 
