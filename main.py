@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from typing import List
 from decimal import Decimal
+import pandas as pd
 import os
 
 
@@ -33,19 +34,56 @@ class Album:
         self.descriptors = descriptors
         self.rym_href = rym_href
 
+    def to_dict(self):
+        return {
+            "rank": self.rank,
+            "title": self.title,
+            "artists": ";".join(self.artists),
+            "average_score": self.average_score,
+            "num_ratings": self.num_ratings,
+            "num_reviews": self.num_reviews,
+            "release_date": self.release_date,
+            "primary_genres": ";".join(self.primary_genres),
+            "secondary_genres": ";".join(self.secondary_genres),
+            "descriptors": ";".join(self.descriptors),
+            "rym_href": self.rym_href,
+        }
+
+    @staticmethod
+    def from_dict(data):
+        return Album(
+            rank=data["rank"],
+            title=data["title"],
+            artists=data["artists"].split(";"),
+            average_score=data["average_score"],
+            num_ratings=data["num_ratings"],
+            num_reviews=data["num_reviews"],
+            release_date=data["release_date"],
+            primary_genres=data["primary_genres"].split(";"),
+            secondary_genres=data["secondary_genres"].split(";"),
+            descriptors=data["descriptors"].split(";"),
+            rym_href=data["rym_href"],
+        )
+
     def __repr__(self):
         return f"[{self.rank}, {self.title}, {self.artists}, {self.num_ratings}, {self.average_score}, {self.num_reviews}, {self.release_date}, {self.primary_genres}, {self.secondary_genres}, {self.descriptors}, {self.rym_href}]\n"
 
     def __str__(self):
         return self.__repr__()
 
+def save_albums_data_to_csv(*albums, file_path="albums.csv"):
+    df = pd.DataFrame([album.to_dict() for album in albums])
+    if os.path.exists(file_path):
+        df.to_csv(file_path, mode="a", header=False, index=False)
+    else:
+        df.to_csv(file_path, index=False)
 
 def get_rym_top_albums_data(page=1, driver=webdriver.Chrome()):
     #    driver.get(f"https://rateyourmusic.com/charts/top/album/all-time/{page}/")
     #
     file_path = os.path.abspath("./mock.html")
     driver.get(f"file://{file_path}")
-    driver.implicitly_wait(0.5)
+    driver.implicitly_wait(1)
     elements = driver.find_elements(By.CLASS_NAME, "page_section_charts_item_wrapper")
     return elements
 
@@ -170,6 +208,7 @@ def generate_album_data(elements: List[WebElement]):
                 rym_href,
             )
         )
+        print(f"Created \"{title}\" album object")
 
     return list
 
@@ -177,4 +216,4 @@ def generate_album_data(elements: List[WebElement]):
 if __name__ == "__main__":
     elements = get_rym_top_albums_data()
     list = generate_album_data(elements)
-    print(list)
+    save_albums_data_to_csv(*list)
